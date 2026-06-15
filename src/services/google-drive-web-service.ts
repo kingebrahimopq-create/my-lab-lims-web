@@ -148,11 +148,18 @@ export const uploadFileToDrive = async (
     form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
     form.append('file', file);
 
+    const vcpToken = import.meta.env.VITE_GOOGLE_VCP_TOKEN;
+    const headers: any = {
+      Authorization: `Bearer ${authState.accessToken}`
+    };
+    
+    if (vcpToken && vcpToken !== 'YOUR_VCP_TOKEN_HERE') {
+      headers['X-VCP-Token'] = vcpToken;
+    }
+
     const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${authState.accessToken}`
-      },
+      headers: headers,
       body: form
     });
 
