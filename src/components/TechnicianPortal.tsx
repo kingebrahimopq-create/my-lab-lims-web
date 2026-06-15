@@ -129,7 +129,7 @@ export default function TechnicianPortal({ tests, onUploadResults, settings }: T
       const valNum = typedVal !== '' ? Number(typedVal) : undefined;
       return {
         ...p,
-        value: valNum,
+        value: valNum !== undefined ? String(valNum) : undefined,
         isAbnormal: valNum !== undefined ? isValueAbnormal(valNum, p.minNormal, p.maxNormal) : false
       };
     });

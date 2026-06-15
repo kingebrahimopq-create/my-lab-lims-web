@@ -424,7 +424,7 @@ ${window.location.origin}${window.location.pathname}?verify=${test.qrToken}
           <div>
             <span className="block text-xs text-slate-400 mb-0.5">العمر / الجنس</span>
             <span className="font-semibold text-slate-700 block mt-1">
-              {getAge(patient.birthDate)} سنة / {getGenderAr(patient.gender)}
+              {getAge(patient.birthDate || '1990-01-01')} سنة / {getGenderAr(patient.gender)}
             </span>
           </div>
 
@@ -486,9 +486,9 @@ ${window.location.origin}${window.location.pathname}?verify=${test.qrToken}
           </thead>
           <tbody className="divide-y divide-slate-100">
             {test.parameters.map((param, index) => {
-              const abnormal = param.value !== undefined && isValueAbnormal(param.value, param.minNormal, param.maxNormal);
-              const tooHigh = param.value !== undefined && param.value > param.maxNormal;
-              const tooLow = param.value !== undefined && param.value < param.minNormal;
+              const abnormal = param.value !== undefined && isValueAbnormal(Number(param.value), param.minNormal, param.maxNormal);
+              const tooHigh = param.value !== undefined && Number(param.value) > param.maxNormal;
+              const tooLow = param.value !== undefined && Number(param.value) < param.minNormal;
 
               return (
                 <tr key={index} className={`hover:bg-slate-50/50 transition-colors ${abnormal ? 'bg-red-50/30' : ''}`}>

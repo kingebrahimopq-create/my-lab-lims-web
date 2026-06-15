@@ -79,8 +79,8 @@ export const handleAuthCallback = async (code: string): Promise<GmailAuthState> 
 
     authState = {
       isAuthenticated: true,
-      userEmail: userInfo.data.email,
-      userName: userInfo.data.name
+      userEmail: userInfo.data.email || undefined,
+      userName: userInfo.data.name || undefined
     };
 
     localStorage.setItem('gmail_auth_state', JSON.stringify(authState));
@@ -143,7 +143,7 @@ export const sendEmail = async (options: EmailOptions): Promise<{ success: boole
 
     return {
       success: true,
-      messageId: response.data.id
+      messageId: response.data.id || undefined
     };
   } catch (error: any) {
     console.error('خطأ في إرسال البريد:', error);

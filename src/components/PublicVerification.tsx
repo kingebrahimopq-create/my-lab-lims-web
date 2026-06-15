@@ -275,7 +275,8 @@ export default function PublicVerification({ tests, patients, initialToken = '',
               
               <div className="space-y-3">
                 {matchedTest.parameters.map((param, i) => {
-                  const outOfRange = param.value !== undefined && (param.value < param.minNormal || param.value > param.maxNormal);
+                  const valNum = param.value !== undefined ? Number(param.value) : NaN;
+                  const outOfRange = param.value !== undefined && !isNaN(valNum) && (valNum < param.minNormal || valNum > param.maxNormal);
                   return (
                     <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-slate-900 border border-slate-800">
                       <div>

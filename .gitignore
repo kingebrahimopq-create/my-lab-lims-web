@@ -29,3 +29,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+git_deploy.ts
+find_git_repo.ts
+firebase-applet-config.json

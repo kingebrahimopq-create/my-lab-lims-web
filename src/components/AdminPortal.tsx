@@ -175,12 +175,12 @@ export default function AdminPortal({
     setTimeout(() => {
       const p = aiPermPrompt.toLowerCase();
       let updatedPerms = [...settings.receptionPermissions];
-      let actionsText = [];
+      let actionsText: string[] = [];
 
       if (p.includes('منع') || p.includes('إلغاء') || p.includes('تعطيل') || p.includes('إيقاف') || p.includes('حظر') || p.includes('منعه')) {
         if (p.includes('فواتير') || p.includes('فاتورة') || p.includes('دفع') || p.includes('تحصيل') || p.includes('مالي') || p.includes('فواتيرها')) {
           updatedPerms = updatedPerms.filter(item => item !== 'billing');
-          actionsText.push('تعطيل صلاحية إصدار الفواتير وتحصيل الأموال ❌' as never);
+          actionsText.push('تعطيل صلاحية إصدار الفواتير وتحصيل الأموال ❌');
         }
         if (p.includes('تسجيل') || p.includes('مرضى') || p.includes('مريض') || p.includes('ملف')) {
           updatedPerms = updatedPerms.filter(item => item !== 'register_patient');
@@ -198,25 +198,25 @@ export default function AdminPortal({
         // Grant permissions
         if (p.includes('فواتير') || p.includes('فاتورة') || p.includes('دفع') || p.includes('تحصيل') || p.includes('مالي')) {
           if (!updatedPerms.includes('billing')) updatedPerms.push('billing');
-          actionsText.push('تمكين صلاحية الفواتير والتحصيل المالي الرقمي ✔' as never);
+          actionsText.push('تمكين صلاحية الفواتير والتحصيل المالي الرقمي ✔');
         }
         if (p.includes('تسجيل') || p.includes('مرضى') || p.includes('مريض') || p.includes('ملف')) {
           if (!updatedPerms.includes('register_patient')) updatedPerms.push('register_patient');
-          actionsText.push('تمكين صلاحية تسجيل وإنشاء السجلات الطبية للمرضى الجدد ✔' as never);
+          actionsText.push('تمكين صلاحية تسجيل وإنشاء السجلات الطبية للمرضى الجدد ✔');
         }
         if (p.includes('مواعيد') || p.includes('موعد') || p.includes('حجز') || p.includes('جدول')) {
           if (!updatedPerms.includes('appointments')) updatedPerms.push('appointments');
-          actionsText.push('تمكين صلاحية جدولة وإدارة المواعيد الطبية وسحب العينات ✔' as never);
+          actionsText.push('تمكين صلاحية جدولة وإدارة المواعيد الطبية وسحب العينات ✔');
         }
         if (p.includes('سجلات') || p.includes('رؤية') || p.includes('عرض') || p.includes('اطلاع')) {
           if (!updatedPerms.includes('view_all_records')) updatedPerms.push('view_all_records');
-          actionsText.push('تمكين صلاحية عرض فهارس وسجلات العائلات السحابية ✔' as never);
+          actionsText.push('تمكين صلاحية عرض فهارس وسجلات العائلات السحابية ✔');
         }
       }
 
       if (actionsText.length === 0) {
         updatedPerms = ['register_patient', 'appointments'];
-        actionsText.push('إعادة تعيين صلاحيات الموظف للحد الأدنى (تسجيل ومواعيد فقط) 🛡' as never);
+        actionsText.push('إعادة تعيين صلاحيات الموظف للحد الأدنى (تسجيل ومواعيد فقط) 🛡');
       }
 
       onUpdateSettings({
@@ -616,7 +616,7 @@ export default function AdminPortal({
                       onClick={() => {
                         setSelectedComplaint(c);
                         setReplyText(c.adminReply || '');
-                        setReplyStatus(c.status === 'pending' ? 'resolved' : c.status);
+                        setReplyStatus(c.status === 'investigating' ? 'investigating' : 'resolved');
                       }}
                       className={`border rounded-2xl p-4 space-y-2 cursor-pointer transition-all ${
                         selectedComplaint?.id === c.id 

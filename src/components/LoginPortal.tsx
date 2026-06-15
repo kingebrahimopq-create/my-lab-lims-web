@@ -241,9 +241,13 @@ export default function LoginPortal({
       name: regNameAr.trim(),
       nameEn: regNameEn.trim() || regNameAr.trim(),
       phone: regPhone.trim(),
-      gender: regGender,
+      gender: regGender === 'ذكر' ? 'male' : 'female',
       birthDate: regDob || "1990-01-01",
-      bloodType: regBlood
+      bloodType: regBlood,
+      age: regDob ? (new Date().getFullYear() - new Date(regDob).getFullYear()) : 30,
+      code: `P-${Date.now().toString().slice(-6)}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     onRegisterPatientBySelf(newPatient);

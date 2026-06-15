@@ -80,9 +80,13 @@ export default function ReceptionPortal({
       name: regName,
       nameEn: regNameEn,
       phone: regPhone,
-      gender: regGender,
+      gender: regGender === 'ذكر' || regGender === 'male' ? 'male' : 'female',
       birthDate: regBirth,
-      bloodType: regBlood
+      bloodType: regBlood,
+      age: regBirth ? (new Date().getFullYear() - new Date(regBirth).getFullYear()) : 30,
+      code: `P-${Date.now().toString().slice(-6)}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     onRegisterPatient(newPat);
     setRegSuccess(`تم تسجيل الملف الطبي للمريض "${regName}" بنجاح!`);
@@ -168,6 +172,12 @@ export default function ReceptionPortal({
       patientId: pat.id,
       patientName: pat.name,
       patientNameEn: pat.nameEn,
+      patientPhone: pat.phone,
+      patientCode: pat.code,
+      testName: titleAr,
+      testCode: `T-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+      price: Number(testCost),
+      createdAt: new Date().toISOString(),
       testType: testTypeSelect,
       titleAr,
       titleEn,
@@ -197,7 +207,7 @@ export default function ReceptionPortal({
   // Filter lists based on search
   const filteredPatients = patients.filter(p => 
     p.name.includes(searchQuery) || 
-    p.nameEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.nameEn && p.nameEn.toLowerCase().includes(searchQuery.toLowerCase())) ||
     p.id.includes(searchQuery) ||
     p.phone.includes(searchQuery)
   );

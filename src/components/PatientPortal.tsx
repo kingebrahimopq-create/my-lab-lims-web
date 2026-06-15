@@ -287,7 +287,7 @@ export default function PatientPortal({
           </div>
           <div className="bg-white/5 backdrop-blur-sm p-3 rounded-xl border border-white/5">
             <span className="text-teal-300 block mb-0.5">{t.patientGenderDob}</span>
-            <span className="font-bold text-sm block">{isAr ? currentPatient.gender : (currentPatient.gender === 'ذكر' || currentPatient.gender === 'male' ? 'Male' : 'Female')} ({currentPatient.birthDate || '1990-01-01'})</span>
+            <span className="font-bold text-sm block">{isAr ? (currentPatient.gender === 'male' ? 'ذكر' : 'أنثى') : (currentPatient.gender === 'male' ? 'Male' : 'Female')} ({currentPatient.birthDate || '1990-01-01'})</span>
           </div>
           <div className="bg-white/5 backdrop-blur-sm p-3 rounded-xl border border-white/5">
             <span className="text-teal-300 block mb-0.5">{t.patientBloodType}</span>
@@ -584,7 +584,7 @@ export default function PatientPortal({
                       <p className="font-mono text-xs text-slate-400 mt-0.5">{tItem.titleEn} | {tItem.id}</p>
                       
                       <div className="flex flex-wrap items-center gap-4 text-[10px] text-slate-400 mt-2 font-mono">
-                        <span>{isAr ? 'قيمة الفاتورة' : 'Invoice'}: {formatPrice(tItem.cost)}</span>
+                        <span>{isAr ? 'قيمة الفاتورة' : 'Invoice'}: {formatPrice(tItem.cost || 0)}</span>
                         <span>•</span>
                         <span>{isAr ? 'تاريخ' : 'Date'}: {tItem.requestDate}</span>
                       </div>

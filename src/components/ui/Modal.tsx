@@ -1,7 +1,7 @@
 import React, { Fragment, ReactNode } from 'react';
 import { cn } from '../../lib/utils';
 import { X } from 'lucide-react';
-import { Button } from './Button';
+import { Button } from './ButtonCustom';
 
 export interface ModalProps {
   isOpen: boolean;
