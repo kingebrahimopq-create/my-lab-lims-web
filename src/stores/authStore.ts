@@ -27,8 +27,6 @@ const DEFAULT_OWNER: Owner = {
   name: 'صاحب المعمل',
   email: 'mhm763517@gmail.com',
   role: 'primary',
-  username: 'admin',
-  password: 'Admin@1234',
   createdAt: new Date().toISOString(),
 };
 
@@ -52,31 +50,22 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem('google_token');
         localStorage.removeItem('auth_state');
         localStorage.removeItem('patient_session');
+        if (typeof window !== 'undefined' && window.google?.accounts?.id) {
+          window.google.accounts.id.disableAutoSelect();
+        }
       },
 
       setLoading: (loading: boolean) => set({ isLoading: loading }),
 
       loginWithCredentials: (username: string, password: string): AuthUser | null => {
-        const { owners, members } = get();
-        for (const owner of owners) {
-          const ownerUsername = owner.username || owner.email;
-          if ((ownerUsername === username || owner.email === username) && owner.password === password) {
-            const authUser: AuthUser = {
-              id: owner.id,
-              email: owner.email,
-              name: owner.name,
-              role: owner.role === 'primary' ? 'owner' : 'admin',
-              isOwner: owner.role === 'primary',
-            };
-            localStorage.setItem('auth_state', JSON.stringify(authUser));
-            get().login(authUser);
-            return authUser;
-          }
-        }
+        const { members } = get();
         for (const member of members) {
           if (member.status !== 'active') continue;
           const memberUsername = member.username || member.email;
-          if ((memberUsername === username || member.email === username) && member.password === password) {
+          if (
+            (memberUsername === username || member.email === username) &&
+            member.password === password
+          ) {
             const authUser: AuthUser = {
               id: member.id,
               email: member.email,
@@ -97,7 +86,9 @@ export const useAuthStore = create<AuthState>()(
         set((state) => ({ members: [...state.members, member] }));
       },
       updateMember: (id: string, member: Partial<Member>) => {
-        set((state) => ({ members: state.members.map((m) => (m.id === id ? { ...m, ...member } : m)) }));
+        set((state) => ({
+          members: state.members.map((m) => (m.id === id ? { ...m, ...member } : m)),
+        }));
       },
       deleteMember: (id: string) => {
         set((state) => ({ members: state.members.filter((m) => m.id !== id) }));
@@ -106,7 +97,9 @@ export const useAuthStore = create<AuthState>()(
         set((state) => ({ owners: [...state.owners, owner] }));
       },
       updateOwner: (id: string, owner: Partial<Owner>) => {
-        set((state) => ({ owners: state.owners.map((o) => (o.id === id ? { ...o, ...owner } : o)) }));
+        set((state) => ({
+          owners: state.owners.map((o) => (o.id === id ? { ...o, ...owner } : o)),
+        }));
       },
       deleteOwner: (id: string) => {
         set((state) => ({ owners: state.owners.filter((o) => o.id !== id) }));
