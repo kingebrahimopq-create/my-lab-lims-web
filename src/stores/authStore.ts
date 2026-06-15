@@ -11,6 +11,7 @@ interface AuthState {
   login: (user: AuthUser) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
+  loginWithCredentials: (username: string, password: string) => AuthUser | null;
   addMember: (member: Member) => void;
   updateMember: (id: string, member: Partial<Member>) => void;
   deleteMember: (id: string) => void;
@@ -26,6 +27,8 @@ const DEFAULT_OWNER: Owner = {
   name: 'صاحب المعمل',
   email: 'mhm763517@gmail.com',
   role: 'primary',
+  username: 'admin',
+  password: 'Admin@1234',
   createdAt: new Date().toISOString(),
 };
 
@@ -48,40 +51,65 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem('auth_user');
         localStorage.removeItem('google_token');
         localStorage.removeItem('auth_state');
+        localStorage.removeItem('patient_session');
       },
 
       setLoading: (loading: boolean) => set({ isLoading: loading }),
 
+      loginWithCredentials: (username: string, password: string): AuthUser | null => {
+        const { owners, members } = get();
+        for (const owner of owners) {
+          const ownerUsername = owner.username || owner.email;
+          if ((ownerUsername === username || owner.email === username) && owner.password === password) {
+            const authUser: AuthUser = {
+              id: owner.id,
+              email: owner.email,
+              name: owner.name,
+              role: owner.role === 'primary' ? 'owner' : 'admin',
+              isOwner: owner.role === 'primary',
+            };
+            localStorage.setItem('auth_state', JSON.stringify(authUser));
+            get().login(authUser);
+            return authUser;
+          }
+        }
+        for (const member of members) {
+          if (member.status !== 'active') continue;
+          const memberUsername = member.username || member.email;
+          if ((memberUsername === username || member.email === username) && member.password === password) {
+            const authUser: AuthUser = {
+              id: member.id,
+              email: member.email,
+              name: member.name,
+              role: member.role,
+              customRole: member.customRole,
+              isOwner: false,
+            };
+            localStorage.setItem('auth_state', JSON.stringify(authUser));
+            get().login(authUser);
+            return authUser;
+          }
+        }
+        return null;
+      },
+
       addMember: (member: Member) => {
         set((state) => ({ members: [...state.members, member] }));
       },
-
       updateMember: (id: string, member: Partial<Member>) => {
-        set((state) => ({
-          members: state.members.map((m) => (m.id === id ? { ...m, ...member } : m)),
-        }));
+        set((state) => ({ members: state.members.map((m) => (m.id === id ? { ...m, ...member } : m)) }));
       },
-
       deleteMember: (id: string) => {
-        set((state) => ({
-          members: state.members.filter((m) => m.id !== id),
-        }));
+        set((state) => ({ members: state.members.filter((m) => m.id !== id) }));
       },
-
       addOwner: (owner: Owner) => {
         set((state) => ({ owners: [...state.owners, owner] }));
       },
-
       updateOwner: (id: string, owner: Partial<Owner>) => {
-        set((state) => ({
-          owners: state.owners.map((o) => (o.id === id ? { ...o, ...owner } : o)),
-        }));
+        set((state) => ({ owners: state.owners.map((o) => (o.id === id ? { ...o, ...owner } : o)) }));
       },
-
       deleteOwner: (id: string) => {
-        set((state) => ({
-          owners: state.owners.filter((o) => o.id !== id),
-        }));
+        set((state) => ({ owners: state.owners.filter((o) => o.id !== id) }));
       },
 
       hasPermission: (permission: string) => {
@@ -94,6 +122,7 @@ export const useAuthStore = create<AuthState>()(
           receptionist: ['patients.view', 'patients.create', 'invoices.view', 'invoices.create', 'results.view'],
           technician: ['tests.view', 'tests.create', 'results.view', 'results.create', 'results.edit'],
           doctor: ['patients.view', 'tests.view', 'results.view', 'results.create', 'results.edit'],
+          doctorAssistant: ['patients.view', 'tests.view', 'results.view'],
         };
         const permissions = rolePermissions[user.role] || [];
         return permissions.includes('*') || permissions.includes(permission);
