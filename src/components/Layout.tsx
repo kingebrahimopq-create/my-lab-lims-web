@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
@@ -19,11 +19,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useTestStore } from '@/stores/testStore';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-export default function Layout({ children }: LayoutProps) {
+export default function Layout() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,7 +39,7 @@ export default function Layout({ children }: LayoutProps) {
     { path: '/invoices', icon: Receipt, label: t('invoices'), visible: pageSettings.invoices },
     { path: '/reports', icon: BarChart3, label: t('reports'), visible: pageSettings.reports },
     { path: '/settings', icon: Settings, label: t('settings'), visible: pageSettings.settings },
-  ].filter((item) => item.visible);
+  ].filter((item) => item.visible !== false);
 
   const handleLogout = () => {
     logout();
@@ -62,7 +58,7 @@ export default function Layout({ children }: LayoutProps) {
         >
           {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
-        <h1 className="font-bold text-lg text-slate-800">{labSettings.labName}</h1>
+        <h1 className="font-bold text-lg text-slate-800">{labSettings?.labName || 'MyLab LIMS'}</h1>
         <div className="relative">
           <Bell className="w-5 h-5 text-slate-600" />
           {pendingResults.length > 0 && (
@@ -94,8 +90,8 @@ export default function Layout({ children }: LayoutProps) {
           </div>
           {(sidebarOpen || mobileMenuOpen) && (
             <div className="overflow-hidden">
-              <h2 className="font-bold text-slate-800 text-sm whitespace-nowrap">{labSettings.labName}</h2>
-              <p className="text-[10px] text-slate-500 whitespace-nowrap">{t('appSubtitle')}</p>
+              <h2 className="font-bold text-slate-800 text-sm whitespace-nowrap">{labSettings?.labName || 'MyLab LIMS'}</h2>
+              <p className="text-[10px] text-slate-500 whitespace-nowrap">نظام إدارة المختبرات</p>
             </div>
           )}
         </div>
@@ -107,7 +103,7 @@ export default function Layout({ children }: LayoutProps) {
               {user?.name?.charAt(0) || '?'}
             </div>
             <div className="overflow-hidden min-w-0">
-              <p className="text-sm font-medium text-slate-700 truncate">{user?.name || t('guest')}</p>
+              <p className="text-sm font-medium text-slate-700 truncate">{user?.name || 'مستخدم'}</p>
               <p className="text-[10px] text-slate-500 truncate">{user?.email || ''}</p>
             </div>
           </div>
@@ -167,7 +163,7 @@ export default function Layout({ children }: LayoutProps) {
           ${sidebarOpen ? 'lg:mr-64' : 'lg:mr-20'}`}
       >
         <div className="p-4 lg:p-6">
-          {children}
+          <Outlet />
         </div>
       </main>
     </div>
