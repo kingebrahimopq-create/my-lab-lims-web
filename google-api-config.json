@@ -1,0 +1,14 @@
+{
+  "clientId": "YOUR_CLIENT_ID.apps.googleusercontent.com",
+  "clientSecret": "YOUR_CLIENT_SECRET",
+  "redirectUri": "https://iavbecvuohuukraoehle.supabase.co/auth/v1/callback",
+  "apiKey": "YOUR_API_KEY",
+  "vcpToken": "YOUR_VCP_TOKEN_HERE",
+  "supabaseUrl": "https://fklfnxuqnjjxdizovsyx.supabase.co",
+  "scopes": [
+    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/gmail.send",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+  ]
+}
