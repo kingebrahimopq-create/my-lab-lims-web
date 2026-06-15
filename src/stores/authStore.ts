@@ -27,6 +27,7 @@ const DEFAULT_OWNER: Owner = {
   name: 'صاحب المعمل',
   email: 'mhm763517@gmail.com',
   role: 'primary',
+  password: 'admin123',
   createdAt: new Date().toISOString(),
 };
 
@@ -50,15 +51,34 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem('google_token');
         localStorage.removeItem('auth_state');
         localStorage.removeItem('patient_session');
-        if (typeof window !== 'undefined' && window.google?.accounts?.id) {
-          window.google.accounts.id.disableAutoSelect();
-        }
       },
 
       setLoading: (loading: boolean) => set({ isLoading: loading }),
 
       loginWithCredentials: (username: string, password: string): AuthUser | null => {
-        const { members } = get();
+        const { members, owners } = get();
+
+        // Check owners first
+        for (const owner of owners) {
+          const ownerUsername = owner.email;
+          if (
+            (ownerUsername === username || owner.email === username) &&
+            owner.password === password
+          ) {
+            const authUser: AuthUser = {
+              id: owner.id,
+              email: owner.email,
+              name: owner.name,
+              role: 'owner',
+              isOwner: true,
+            };
+            localStorage.setItem('auth_state', JSON.stringify(authUser));
+            get().login(authUser);
+            return authUser;
+          }
+        }
+
+        // Check members
         for (const member of members) {
           if (member.status !== 'active') continue;
           const memberUsername = member.username || member.email;
@@ -108,7 +128,7 @@ export const useAuthStore = create<AuthState>()(
       hasPermission: (permission: string) => {
         const { user } = get();
         if (!user) return false;
-        if (user.isOwner || user.role === 'admin') return true;
+        if (user.isOwner || user.role === 'admin' || user.role === 'owner') return true;
         const rolePermissions: Record<UserRole, string[]> = {
           owner: ['*'],
           admin: ['*'],
