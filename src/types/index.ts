@@ -106,9 +106,12 @@ export interface Member {
   name: string;
   email: string;
   phone?: string;
-  role: 'owner' | 'admin' | 'receptionist' | 'technician' | 'doctor';
+  role: UserRole;
+  customRole?: string;
   status: 'active' | 'inactive';
   permissions: string[];
+  username: string;
+  password: string;
   createdAt: string;
 }
 
@@ -119,6 +122,8 @@ export interface Owner {
   phone?: string;
   role: 'primary' | 'co';
   googleId?: string;
+  username?: string;
+  password?: string;
   createdAt: string;
 }
 
@@ -187,7 +192,7 @@ export interface GoogleDriveConfig {
   folderId?: string;
 }
 
-export type UserRole = 'owner' | 'admin' | 'receptionist' | 'technician' | 'doctor';
+export type UserRole = 'owner' | 'admin' | 'receptionist' | 'technician' | 'doctor' | 'doctorAssistant';
 
 export interface AuthUser {
   id: string;
@@ -195,5 +200,15 @@ export interface AuthUser {
   name: string;
   picture?: string;
   role: UserRole;
+  customRole?: string;
   isOwner: boolean;
 }
+
+export const ROLE_LABELS: Record<UserRole, string> = {
+  owner: 'مالك',
+  admin: 'مدير',
+  receptionist: 'موظف استقبال',
+  technician: 'فني مختبر',
+  doctor: 'طبيب',
+  doctorAssistant: 'مساعد طبيب',
+};
