@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "description": "",
+  "name": "MyLab LIMS",
+  "description": "A highly polished, responsive, and fully integrated Laboratory Information Management System (LIMS) styled with the modern 'Sleek' design theme.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
