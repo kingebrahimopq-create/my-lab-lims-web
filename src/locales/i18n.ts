@@ -1,19 +1,15 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { arTranslations } from './ar';
-
-const resources = {
-  ar: {
-    translation: arTranslations as Record<string, string | Record<string, string>>
-  }
-};
+import { ar } from './ar';
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources,
+    resources: {
+      ar: ar,
+    },
     lng: 'ar',
     fallbackLng: 'ar',
     interpolation: {
