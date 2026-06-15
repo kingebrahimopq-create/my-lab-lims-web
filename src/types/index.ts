@@ -7,6 +7,7 @@ export interface Patient {
   address?: string;
   age: number;
   gender: 'male' | 'female';
+  nationalId?: string;
   notes?: string;
   createdAt: string;
   updatedAt: string;

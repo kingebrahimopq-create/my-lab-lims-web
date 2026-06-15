@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+declare const gapi: any;
+
 const CLIENT_ID = '313164369951-4f3a3sde194h9hnsskbg0jvdl8l2shk.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyC_r_T5m_HIy3CaU1y0iAqMc6rV6_qKPfk';
 const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata';

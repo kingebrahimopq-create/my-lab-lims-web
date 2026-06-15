@@ -2,96 +2,84 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Invoice, InvoiceTest } from '@/types';
 
+interface Totals {
+  subtotal: number;
+  discountAmount: number;
+  total: number;
+}
+
 interface InvoiceState {
   invoices: Invoice[];
   addInvoice: (invoice: Invoice) => void;
   updateInvoice: (id: string, invoice: Partial<Invoice>) => void;
   deleteInvoice: (id: string) => void;
-  getInvoiceById: (id: string) => Invoice | undefined;
-  getInvoicesByPatient: (patientId: string) => Invoice[];
-  getTodayInvoices: () => Invoice[];
+  getInvoice: (id: string) => Invoice | undefined;
   getTodayRevenue: () => number;
-  getPendingPayments: () => Invoice[];
+  getMonthRevenue: () => number;
   generateInvoiceNumber: () => string;
-  calculateTotals: (tests: InvoiceTest[], discountType: 'percentage' | 'fixed' | 'none', discountValue: number) => { subtotal: number; discountAmount: number; total: number };
+  calculateTotals: (tests: InvoiceTest[], discountType: 'percentage' | 'fixed' | 'none', discountValue: number) => Totals;
 }
-
-let invoiceCounter = 1;
 
 export const useInvoiceStore = create<InvoiceState>()(
   persist(
     (set, get) => ({
       invoices: [],
-
       addInvoice: (invoice: Invoice) => {
         set((state) => ({ invoices: [...state.invoices, invoice] }));
       },
-
       updateInvoice: (id: string, invoice: Partial<Invoice>) => {
         set((state) => ({
-          invoices: state.invoices.map((i) =>
-            i.id === id ? { ...i, ...invoice, updatedAt: new Date().toISOString() } : i
-          ),
+          invoices: state.invoices.map((i) => (i.id === id ? { ...i, ...invoice } : i)),
         }));
       },
-
       deleteInvoice: (id: string) => {
-        set((state) => ({
-          invoices: state.invoices.filter((i) => i.id !== id),
-        }));
+        set((state) => ({ invoices: state.invoices.filter((i) => i.id !== id) }));
       },
-
-      getInvoiceById: (id: string) => {
+      getInvoice: (id: string) => {
         return get().invoices.find((i) => i.id === id);
       },
-
-      getInvoicesByPatient: (patientId: string) => {
-        return get().invoices.filter((i) => i.patientId === patientId);
-      },
-
-      getTodayInvoices: () => {
-        const today = new Date().toDateString();
-        return get().invoices.filter(
-          (i) => new Date(i.createdAt).toDateString() === today
-        );
-      },
-
       getTodayRevenue: () => {
         const today = new Date().toDateString();
         return get()
-          .invoices.filter((i) => new Date(i.createdAt).toDateString() === today)
+          .invoices.filter(
+            (i) => new Date(i.createdAt).toDateString() === today && i.paymentStatus !== 'unpaid'
+          )
           .reduce((sum, i) => sum + i.paid, 0);
       },
-
-      getPendingPayments: () => {
-        return get().invoices.filter(
-          (i) => i.paymentStatus === 'unpaid' || i.paymentStatus === 'partial'
-        );
+      getMonthRevenue: () => {
+        const now = new Date();
+        return get()
+          .invoices.filter((i) => {
+            const d = new Date(i.createdAt);
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && i.paymentStatus !== 'unpaid';
+          })
+          .reduce((sum, i) => sum + i.paid, 0);
       },
-
       generateInvoiceNumber: () => {
-        const date = new Date();
-        const year = date.getFullYear().toString().slice(-2);
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const counter = String(invoiceCounter++).padStart(4, '0');
-        return `INV-${year}${month}${day}-${counter}`;
+        const invoices = get().invoices;
+        const today = new Date();
+        const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+        const todayInvoices = invoices.filter(
+          (i) => new Date(i.createdAt).toDateString() === today.toDateString()
+        );
+        const seq = String(todayInvoices.length + 1).padStart(3, '0');
+        return `INV-${dateStr}-${seq}`;
       },
-
-      calculateTotals: (tests: InvoiceTest[], discountType: 'percentage' | 'fixed' | 'none', discountValue: number) => {
+      calculateTotals: (tests: InvoiceTest[], discountType: 'percentage' | 'fixed' | 'none', discountValue: number): Totals => {
         const subtotal = tests.reduce((sum, t) => sum + t.testPrice, 0);
         let discountAmount = 0;
         if (discountType === 'percentage') {
-          discountAmount = subtotal * (discountValue / 100);
+          discountAmount = (subtotal * discountValue) / 100;
         } else if (discountType === 'fixed') {
-          discountAmount = discountValue;
+          discountAmount = Math.min(discountValue, subtotal);
         }
-        const total = Math.max(0, subtotal - discountAmount);
-        return { subtotal, discountAmount, total };
+        return {
+          subtotal,
+          discountAmount,
+          total: Math.max(0, subtotal - discountAmount),
+        };
       },
     }),
-    {
-      name: 'invoice-storage',
-    }
+    { name: 'invoice-storage' }
   )
 );
