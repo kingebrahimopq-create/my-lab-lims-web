@@ -1,12 +1,14 @@
 import path from "path"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
-import { inspectAttr } from 'kimi-plugin-inspect-react'
 
-// https://vite.dev/config/
+// GitHub Actions sets GITHUB_ACTIONS=true — use repo-relative base for Pages
+// Vercel and local dev use root base
+const base = process.env.GITHUB_ACTIONS === 'true' ? '/my-lab-lims-web/' : '/'
+
 export default defineConfig({
-  base: './',
-  plugins: [inspectAttr(), react()],
+  base,
+  plugins: [react()],
   server: {
     port: 3000,
   },
@@ -15,4 +17,4 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-});
+})
